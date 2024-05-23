@@ -1,0 +1,359 @@
+openapi: 3.0.3
+info:
+  title: Service Catalog - OpenAPI 3.0
+  description: |-
+    This is an OpenAPI specification for Service Catalog. It lists all APIs in the service, along with their description, responses, etc.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/v1
+  - url: http://localhost:8081
+tags:
+  - name: serviceOperations
+    description: All APIs related to service operations. These are versioned.
+  - name: healthcheck
+    description: Healthcheck APIs
+  - name: metrics
+    description: Metrics API for scraping service metrics
+paths:
+  /services:
+    get:
+      tags:
+      - serviceOperations
+      summary: Fetch all services in the catalog.
+      description: Fetching is paginated by default.
+      operationId: getServices
+      parameters:
+        - name: page
+          in: query
+          description: Page number value for accessing different pages.
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: sort
+          in: query
+          description: For sorting the resultant output in ascending or descending order. Default order is ascending by name
+          required: false
+          schema:
+            type: string
+            default: ASC
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Service'          
+        '401':
+          description: invalid key
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: []
+  /service:
+    post:
+      tags:
+      - serviceOperations
+      summary: Creates a service
+      description: Service information is sent via request body.
+      operationId: createService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceRequest'
+      responses:
+        '201':
+          description: Service Created Successfully
+        '400':
+          description: Bad Request
+        '401':
+          description: invalid key
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: []
+    patch:
+      tags:
+      - serviceOperations
+      summary: Updates a specific service
+      description: Service information is sent via request body.
+      operationId: updateService
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceRequest'
+      responses:
+        '200':
+          description: Service created successfully
+        '400':
+          description: Bad Request
+        '401':
+          description: invalid key
+        '404':
+          description: service not found
+      security:
+        - api_key: []
+  /service/{serviceName}:
+    get:
+      tags:
+      - serviceOperations
+      summary: Fetches a specific service information
+      description: Service information is displayed along side versions. Versions are by-default paginated.
+      operationId: getServiceByName
+      parameters:
+        - name: serviceName
+          in: path
+          description: Name of the service to fetch
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number value for accessing different pages to check for versions in a service.
+          required: false
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'   
+        '400':
+          description: Bad Request
+        '401':
+          description: invalid key
+        '404':
+          description: service not found
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: []
+    delete:
+      tags:
+      - serviceOperations
+      summary: Deletes a specific service, along with all its versions
+      description: Soft deletes the service, along with all its versions
+      operationId: deleteServiceByName
+      parameters:
+        - name: serviceName
+          in: path
+          description: Name of the service to fetch
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Service Deleted Successfully
+        '401':
+          description: invalid key
+        '400':
+          description: Bad Request
+        '404':
+          description: Service Not Found
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: []
+  /service/version:
+    post:
+      tags:
+      - serviceOperations
+      summary: Creates a service version
+      description: Service version information is sent via request body.
+      operationId: createServiceVersion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceVersionRequest'
+      responses:
+        '201':
+          description: Service Version Created Successfully
+        '400':
+          description: Bad Request
+        '401':
+          description: invalid key
+        '404':
+          description: service not found
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: []
+  /service/{serviceName}/version/{versionName}:
+    delete:
+      tags:
+      - serviceOperations
+      summary: Deletes a specific service version
+      description: Soft deletes the service version, and decrements version count in the service object
+      operationId: deleteServiceVersion
+      parameters:
+        - name: serviceName
+          in: path
+          description: Name of the service to fetch
+          required: true
+          schema:
+            type: string
+        - name: versionName
+          in: path
+          description: Name of the version to fetch
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Version deleted successfully
+        '401':
+          description: invalid key
+        '400':
+          description: Bad Request
+        '404':
+          description: Service Not Found
+        '500':
+          description: Internal Server Error
+      security:
+        - api_key: []
+  /ping:
+    get:
+      tags:
+      - healthcheck
+      summary: Healthcheck endpoint for the service, not versioned. Doesn't need /v1
+      description: Responds "pong" when the server is running
+      operationId: ping
+      responses:
+        '200':
+          description: Pong
+        '500':
+          description: Internal Server Error
+  /metrics:
+    get:
+      tags:
+      - metrics
+      summary: Metrics endpoint for the service runs on server port 8081 by default
+      description: Shows prometheus compliant metrics
+      operationId: metrics
+      responses:
+        '200':
+          description: Shows the metrics collected
+        '500':
+          description: Internal Server Error
+      
+components:
+  schemas:
+    Service:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: test-service
+        description:
+          type: string
+          example: This is a test service
+        version_count:
+          type: integer
+          format: int64
+          example: 1
+          default: 0
+        created_at:
+          type: string
+          format: date-time-with-time-zone
+          example: 2017-07-21T17:32:28Z+05:30
+        deleted_at:
+          type: string
+          format: date-time-with-time-zone
+          example: 2017-07-21T17:32:28Z+05:30
+          default: null
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Version'
+    Version:
+      required:
+        - id
+        - name
+        - service_id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: v1.0.1
+        description:
+          type: string
+          example: This is the first version
+        service_id:
+          type: integer
+          format: int64
+          example: 1
+        created_at:
+          type: string
+          format: date-time-with-time-zone
+          example: 2017-07-21T17:32:28Z+05:30
+        deleted_at:
+          type: string
+          format: date-time-with-time-zone
+          example: 2017-07-21T17:32:28Z+05:30
+          default: null
+    ServiceRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: test-service
+        description:
+          type: string
+          example: This is the first version
+    ServiceVersionRequest:
+      type: object
+      required:
+        - name
+        - service_id
+      properties:
+        name:
+          type: string
+          example: v1.0.1
+        description:
+          type: string
+          example: This is the first version
+        service_id:
+          type: integer
+          format: int64
+          example: 1
+  requestBodies:
+    ServiceRequest:
+      description: Service object that needs to be added to the catalog or updated in catalog
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ServiceRequest'
+    ServiceVersionRequest:
+      description: List of user object
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ServiceVersionRequest'
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: Authorization
+      in: header
