@@ -31,7 +31,7 @@ func RegisterRoutes(app *echo.Echo) {
 
 	appV1.GET("/services", api.GetServices)
 
-	appV1.GET("/services/:serviceName", api.GetService)
+	appV1.GET("/service/:serviceName", api.GetService)
 
 	appV1.POST("/service", api.CreateService)
 
