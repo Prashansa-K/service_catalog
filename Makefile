@@ -2,8 +2,12 @@
 source:
 	@. .envrc
 .PHONY: run
-run: source
+run: source init-localdev
 	go run cmd/main.go
+
+.PHONY: init-localdev
+init-localdev:
+	./scripts/init-localdev.sh
 
 .PHONY: build
 build: source
