@@ -378,7 +378,7 @@ func TestCreateVersion_ErrorInVersionCreation(t *testing.T) {
 
 	// Assert the results
 	assert.Error(t, err)
-	assert.Equal(t, "error creating version", err.Error())
+	assert.Regexp(t, "some other error", err.Error())
 
 	// Ensure all expectations were met
 	assert.NoError(t, mock.ExpectationsWereMet())

@@ -31,7 +31,8 @@ func GetPaginatedServicesByFilters(db *gorm.DB, page int, sort, nameFilter, desc
 	}
 
 	totalPages := int(math.Ceil(float64(totalServices) / float64(constants.PAGE_SIZE)))
-	if page > totalPages {
+	// in case if there no records we don't want to throw any error
+	if page > totalPages && page != 1 {
 		return -1, nil, errors.New(constants.INVALID_PAGE_NUMBER)
 	}
 
