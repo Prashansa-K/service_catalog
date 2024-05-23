@@ -1,6 +1,3 @@
---- Creating Database
-CREATE DATABASE IF NOT EXISTS servicecatalog;
-
 --- Creating Tables
 CREATE TABLE IF NOT EXISTS services (
   id SERIAL PRIMARY KEY,
