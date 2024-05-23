@@ -27,6 +27,11 @@ An end-user should be able see an overview of services in their organization usi
 | DELETE | /v1/service/:serviceName                      | Deletes a service, along with all its versions                                                |
 | DELETE | /v1/service/:serviceName/version/:versionName | Deletes a service's version                                                                   |
 
+### Future plans
+Along with the above APIs, we can add Bulk APIs too for service and version creations or deletions. This API can take multiple inputs at once and process them asyncronously.
+We can return a `202 Accepted` response to the user along with a requestId. They can later check the status of creation with the requestId.
+
+Async processing here would help in keeping the UX clean, where the user doesn't have to wait for the updates and can come back later and check.
 
 ## How to run the project locally?
 ### Pre-requisties:
