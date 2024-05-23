@@ -42,4 +42,7 @@ Except for the healthcheck route, all routes have the following middlewares:
     [./internal/api/v1/services.go, line 36](./internal/api/v1/services.go) - commented out part shows how to use tracing for all functions.
 - Metrics
 
+## Security Features - Future plans
+- Creating TLS certificates using Let's Encrypt and serving the APIs using HTTPS.
+- Using a TLS connection with the database.
 

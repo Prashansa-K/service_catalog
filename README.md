@@ -49,6 +49,9 @@ This will initialise the project dependencies:
 Both of these will be started as docker containers.
 For the same the following ports are needed to be free: 5432, 5775, 6831, 6832, 5778, 9411, 16686, 14268
 
+#### Future plans
+For now, creating database and required tables is handled in the init-localdev.sh script. For improving this in the future, [goose](https://github.com/pressly/goose) can be used for handling all migrations.
+
 ### How to access?
 - Primary server would start on port 8080 by default. You can access the APIs via the url: http://localhost:8080/
 - Additionally, a metrics server will begin on port 8081. Access it via http://localhost:8081/metrics
